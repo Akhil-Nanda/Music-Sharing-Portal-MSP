@@ -13,7 +13,7 @@ from django.core.mail import send_mail
 # email verification
 
 def verify_email(email):
-    api_key = 'live_edb42e2cafbf02a566fa5b486039cd6cedf850ce16ab4b8232331cbb0942979f'
+    api_key = 'enter your api key'
     url = f'https://api.kickbox.com/v2/verify?email={email}'
     
     headers = {
