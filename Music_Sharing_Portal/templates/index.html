@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Index {% endblock %}
+{% block content %}
+
+<div class="fluid-container" style="height:fit-content;min-height:100vh;">
+<!--    Navbar    -->
+    <nav class="navbar index-nav">
+        <a class="navbar-brand" href="" ><b>Music Sharing Portal</b></a>
+        <div>
+            {% if user.is_authenticated %}
+            <button class="btn btn-primary">{{user.first_name}}</button>
+            {% endif %}
+            <a href="{% url 'authentication:logout' %}"><button class="btn btn-primary nav-btn">Logout</button></a>
+        </div>
+    </nav>
+
+<!--   music upload section  -->
+
+    <div class="row hero-row mt-3">
+        <div class="col-sm-12 col-md-4 col-lg-4">
+            <div class="shadow card" style="margin-left:20px;border-radius:10px;">
+                <div class="card-body">
+                    <div class="card-title">
+                        <h3 class="card-h">Upload Files Here</h3>
+                        {% if user.is_authenticated %}
+                            <form method="POST" action="{% url 'Home:index' %}" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <div class="form-group upload-card-margin">
+                                    <label for="filename">File name:</label>
+                                    <input type="text" class="form-control" id="filename" name="file_name" required>
+                                </div>
+                                <div class="form-group upload-card-margin">
+                                     <label for="file">File:</label>
+                                    <input type="file" class="form-control" id="file" accept=".mp3" name="file" required>
+                                </div>
+                                <div class="form-group upload-card-margin">
+                                     <label for="file_image">Image:</label>
+                                    <input type="file" class="form-control" id="file_image" accept=".png" name="file_image" required>
+                                </div>
+                                <div class="form-group upload-card-margin">
+                                     <label for="visibility">Visibility:</label>
+                                    <select class="form-control" id="visibility" name="visibility" required>
+                                        <option value="public">--Select visibility type--</option>
+                                        <option value="public">Public</option>
+                                        <option value="private">Private</option>
+                                        <option value="protected">Protected</option>
+                                    </select>
+                                </div>
+                                <div class="form-group upload-card-margin" style="display: none;" id="p_email">
+                                     <label>Email(user who need access):</label>
+                                    <input type="text" class="form-control"  name="p_email">
+                                </div>
+                                <a href="{% url 'Home:index' %}"><button type="submit" class="btn btn-primary" >UPLOAD</button></a>
+                            </form>
+                        {% endif %}
+                        <br>
+                        {% for i in messages %}
+                            <div class="alert">
+                                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                                {{i}}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+<!--        files display section-->
+
+
+        <div class="col-sm-12 col-md-8 col-lg-8">
+            <div class="shadow card" style="margin-right:20px;border-radius:10px;">
+                <div class="card-body">
+
+                    <!--     Public files section-->
+
+                    <a href="{% url 'Home:public_files' %}" style="text-decoration:none;"><h4 class="file-card">Public files </h4></a>
+                    <hr>
+                    <div class="row">
+                    {% for i in public_files %}
+                        <div class="col-sm-6 col-lg-3 col-md-3">
+                            <div class=" shadow card h-60 mb-3 mt-3" style="border-radius:10px;text-align:center;">
+                                <img class="card-img-top" src="{{ i.file_image.url }}" height="150px;">
+                                <div class="card-body">
+                                    <div class="card-title">
+                                        <p class="file_name">{{i.file_name}}</p><br>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <a href="{% url 'Home:download_file' i.id %}"><i class="fa fa-play-circle" style="font-size:48px;color:blue;"></i></a>
+                                            </div>
+                                            <div class="col-6" style="display:flex;justify-content:right;align-items:center;">
+                                                {% if user.is_authenticated %}
+                                                <a href="{% url 'Home:public_delete' i.id user.id %}"><i class="fa fa-trash" style="font-size:25px;"></i></a><br>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+
+                    <!--     Private files section-->
+
+                    <a href="{% url 'Home:private' %}" style="text-decoration:none;"><h4 class="file-card">Private files </h4></a>
+                    <hr>
+                    <div class="row">
+                        {% for i in private_files %}
+                        <div class="col-sm-6 col-lg-3 col-md-3">
+                            <div class="shadow card h-80 mb-3 mt-3" style="border-radius:10px;">
+                                <div class="card-body">
+                                    <img class="card-img-top" src="{{ i.file_image.url }}" width="100px;">
+                                    <div class="card-title">
+                                        <p class="file_name">{{i.file_name}}</p><br>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <a href="{% url 'Home:download_file' i.id %}"><i class="fa fa-play-circle" style="font-size:48px;color:green"></i></a>
+                                            </div>
+                                            <div class="col-6" style="display:flex;justify-content:right;align-items:center;">
+                                                <a href="{% url 'Home:delete' i.id %}"><i class="fa fa-trash" style="font-size:25px;"></i></a><br>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+
+                    <!--     Protected files section-->
+
+                    <a href="{% url 'Home:protected' %}" style="text-decoration:none;"><h4 class="file-card">Protected files</h4></a>
+                    <div class="row">
+                        {% for i in protected_files %}
+                        <div class="col-sm-6 col-lg-3 col-md-3">
+                            <div class="shadow card h-80 mb-3 mt-3" style="border-radius:10px;">
+                                <img class="card-img-top" src="{{i.file_image.url}}">
+                                <div class="card-body">
+                                    <div class="card-title">
+                                        <p class="file_name">{{i.file_name}}</p><br>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <a href="{% url 'Home:download_file' i.id %}"><i class="fa fa-play-circle" style="font-size:48px;color:green"></i></a>
+                                            </div>
+                                            <div class="col-6" style="display:flex;justify-content:right;align-items:center;">
+                                                <a href="{% url 'Home:protected_delete' i.id %}"><i class="fa fa-trash" style="font-size:25px;"></i></a><br>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  // JavaScript for showing email input field when protected option is selected
+
+  const    visibility = document.getElementById('visibility');
+  const p_email = document.getElementById('p_email');
+
+  visibility.addEventListener('change', function() {
+    if (visibility.value === 'protected') {
+      p_email.style.display = 'block';
+    } else {
+      p_email.style.display = 'none';
+    }
+  });
+</script>
+
+{% endblock %}

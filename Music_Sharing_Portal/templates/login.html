@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Login {% endblock %}
+{% block content %}
+<div class="container auth-container">
+    <div class="col-lg-6">
+        <div class="shadow cards" style="padding:50px;border-radius:10px;">
+        <h2 class="auth-title">LOGIN FORM</h2>
+    <form method="POST">
+    {% csrf_token %}
+
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" class="form-control" id="email" name="username" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" class="form-control" id="password" name="password" required>
+      </div>
+        <br>
+
+      <button type="submit" class="btn btn-primary">Login</button>
+    </form><br>
+       <p>Dont have an account?<a href="{% url 'authentication:register' %}">register here</a></p><br>
+            {% for i in messages %}
+            <div class="alert">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                {{i}}
+            </div>
+            {% endfor %}
+    </div>
+        </div>
+</div>
+{% endblock %}
